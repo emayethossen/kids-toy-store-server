@@ -30,17 +30,23 @@ async function run() {
         const toyCollection = client.db('toyDB').collection('toy')
 
         app.get('/toys', async (req, res) => {
-            console.log(req.query.email);
+            const sort = req.query.sort;
             let query = {};
             if (req.query?.email) {
                 query = { email: req.query.email }
             }
-            const result = await toyCollection.find(query).toArray()
+            const options = {
+                sort: {
+                    "price": sort === 'asc' ? 1 : -1
+                }
+
+            };
+            const result = await toyCollection.find(query, options).sort({ price: 1 }).toArray()
             res.send(result)
         })
 
         app.get('/toys', async (req, res) => {
-            const cursor = toyCollection.find();
+            const cursor = toyCollection.find().limit(20);
             const result = await cursor.toArray();
             res.send(result);
         })
